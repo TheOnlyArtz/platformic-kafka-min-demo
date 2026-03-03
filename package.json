@@ -1,0 +1,33 @@
+{
+  "name": "platformatic-kafka-minimum-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NestJS minimum reproducible example for Platformatic Kafka throughput behavior",
+  "scripts": {
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main.js",
+    "benchmark:produce": "tsx scripts/produce.ts",
+    "benchmark:uplink": "tsx scripts/uplink-listener.ts"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.0.1",
+    "@nestjs/platform-express": "^11.0.1",
+    "@platformatic/kafka": "^1.28.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@types/node": "^22.10.7",
+    "tsx": "^4.20.4",
+    "typescript": "~5.9.2"
+  }
+}
