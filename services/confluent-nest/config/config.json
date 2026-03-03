@@ -1,0 +1,17 @@
+{
+  "http": {
+    "port": 3002
+  },
+  "kafka": {
+    "brokers": [
+      "kafka:9092"
+    ],
+    "groupId": "benchmark-confluent",
+    "ssl": {
+      "certPath": "",
+      "keyPath": ""
+    },
+    "downlinkTopic": "kafka.benchmark.downlink",
+    "uplinkTopic": "kafka.benchmark.uplink"
+  }
+}
