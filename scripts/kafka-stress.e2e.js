@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const { Kafka, CompressionTypes } = require('kafkajs')
+const crypto = require('node:crypto')
 const { performance } = require('node:perf_hooks')
-const { investigator } = require('@tsgs/icd-types')
 
 const BROKERS = (process.env.E2E_KAFKA_BROKERS ?? '0.0.0.0:19092')
   .split(',')
@@ -12,7 +12,6 @@ const BROKERS = (process.env.E2E_KAFKA_BROKERS ?? '0.0.0.0:19092')
 const CLIENT_ID = process.env.E2E_CLIENT_ID ?? 'kafka-stress-e2e'
 const TOPIC =
   process.env.E2E_TOPIC ?? `kafka.benchmark.downlink`
-const TAIL_NUMBER = process.env.E2E_TAIL_NUMBER ?? '9999'
 
 const TOTAL_MESSAGES = 5000
 const BATCH_SIZE = 100
@@ -29,33 +28,13 @@ const COMPRESSION_TYPES = {
   zstd: CompressionTypes.ZSTD,
 }
 
-function objectifyBigInts(value) {
-  if (typeof value === 'bigint') {
-    return { type: 'BigInt', value: value.toString() }
-  }
-
-  if (Array.isArray(value)) {
-    return value.map((item) => objectifyBigInts(item))
-  }
-
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, objectifyBigInts(entry)]))
-  }
-
-  return value
-}
-
-const BASE_DATA = objectifyBigInts(new investigator.PayloadReportData())
+const PAYLOAD_BUFFER = Buffer.alloc(1024, 0)
 
 function buildPayload() {
   return {
-    header: {
-      type: 'investigator',
-      tailNumber: TAIL_NUMBER,
-      messageTypeId: investigator.IcdOpcodes.OP_PayloadReport,
-      timestamp: Math.floor(Date.now() / 1000),
-    },
-    data: BASE_DATA,
+    id: crypto.randomUUID(),
+    timestamp: Math.floor(Date.now() / 1000),
+    payload: PAYLOAD_BUFFER.toJSON().data,
   }
 }
 
@@ -82,7 +61,6 @@ async function run() {
   console.log('Kafka stress test starting...')
   console.log(`Brokers: ${BROKERS.join(', ')}`)
   console.log(`Topic: ${TOPIC}`)
-  console.log(`TailNumber: ${TAIL_NUMBER}`)
   console.log(`Total: ${TOTAL_MESSAGES} | Batch: ${BATCH_SIZE} | InFlight: ${IN_FLIGHT}`)
 
   const compressionType = toCompressionType()
